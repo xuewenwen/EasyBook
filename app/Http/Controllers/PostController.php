@@ -1,33 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use function foo\func;
-use Illuminate\Http\Request;
+use App\Post;
 
 class PostController extends Controller
 {
     public function index()
     {
 
-        $posts=[
-            ['title'=>"this is title1",
-
-            ],
-            ['title'=>"this is title2",
-
-            ],
-
-            ['title'=>"this is title3",
-
-            ]
-
-        ];
+        $posts=Post::orderBy('created_at','desc')->paginate(5);
         return view("post/index",compact('posts')/*['posts'=>$posts]*/);
     }
-    public function show()
+    public function show(Post $post)
     {
-        return view("post/show",['title'=>'this is title','isShow'=>true]);
+        return view("post/show",compact('post')/*['title'=>'this is title','*//*isShow'=>true]*/);
     }
     public function create()
     {
@@ -35,19 +21,48 @@ class PostController extends Controller
     }
     public function store()
     {
-        return view("post/store");
+        /*$post =new Post();
+        $post->title=request('title');
+        $post->content=request('content');
+        $post->save();
+
+        $params =['title'=>request('title'),'content'=>request('content')];*/
+
+      /*  $params = request(['title','content']);
+        Post::create($params);*/
+
+        $post = Post::create(request(['title','content']));
+
+        /*dd($post);*/
+                   return redirect("/posts");
+        //dump and die 打印数据不执行操作
+        //dd(\Request::all());
+
+       /* dd(request()->all());*/
     }
-    public function edit()
+    public function edit(Post $post)
     {
-        return view("post/edit");
+        return view("post/edit",compact('post'));
     }
-    public function update()
+    public function update(Post $post)
     {
-        return view("post/update");
+
+        //验证
+        //逻辑
+        $post->title=request('title');
+        $post->content=request('content');
+        $post->save();
+
+        //渲染
+        return redirect("/posts/{$post->id}");
+
     }
-    public function delete()
+    public function delete(Post $post)
     {
-        return view("post/delete");
+      $post->delete();
+
+      //用户权限验证
+      return redirect("/posts");
     }
 }
 
