@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Post;
-
+use App\Zan;
 class PostController extends Controller
 {
     public function index()
@@ -30,8 +30,10 @@ class PostController extends Controller
 
       /*  $params = request(['title','content']);
         Post::create($params);*/
+        $user_id= \Auth::id();
+        $params = array_merge(request(['title','content']),compact('user_id'));
 
-        $post = Post::create(request(['title','content']));
+        $post =Post::create($params);
 
         /*dd($post);*/
                    return redirect("/posts");
@@ -48,6 +50,8 @@ class PostController extends Controller
     {
 
         //验证
+        //你写文章你才能编辑
+        $this->authorize('update','post');
         //逻辑
         $post->title=request('title');
         $post->content=request('content');
@@ -59,10 +63,21 @@ class PostController extends Controller
     }
     public function delete(Post $post)
     {
+        $this->authorize('delete','post');
       $post->delete();
 
       //用户权限验证
       return redirect("/posts");
+    }
+
+    public function zan(Post $post)
+    {
+         //
+    }
+
+    public function unzan(Post $post)
+    {
+         //
     }
 }
 
